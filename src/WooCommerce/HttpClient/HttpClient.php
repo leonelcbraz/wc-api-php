@@ -362,6 +362,14 @@ class HttpClient
     protected function processResponse()
     {
         $body = $this->response->getBody();
+        $body = preg_match("/{[\s\S]*}/", $body, $matches);
+
+        if( count($matches) <= 0 ){
+            $message = 'Invalid JSON returned';
+            throw new HttpClientException($message, $this->response->getCode(), $this->request, $this->response);
+        }
+
+        $body = $matches[0];
 
         if (0 === strpos(bin2hex($body), 'efbbbf')) {
             $body = substr($body, 3);
